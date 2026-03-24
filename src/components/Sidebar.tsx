@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Calendar, Scissors, Users, MessageSquare, Settings, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Calendar, Scissors, Users, MessageSquare, Settings, Menu, X, LogOut } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -13,6 +14,7 @@ const navItems = [
 
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
+  const { user, signOut } = useAuth();
 
   return (
     <>
@@ -71,10 +73,13 @@ const Sidebar = () => {
             <div className="w-9 h-9 rounded-full bg-gradient-gold flex items-center justify-center">
               <Scissors className="w-4 h-4 text-accent-foreground" />
             </div>
-            <div>
-              <p className="text-sm font-medium text-foreground">Meu Perfil</p>
-              <p className="text-xs text-muted-foreground">Barbeiro</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground truncate">{user?.user_metadata?.name || 'Barbeiro'}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
             </div>
+            <button onClick={signOut} className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors" title="Sair">
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </aside>
