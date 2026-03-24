@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Calendar, Scissors, Users, MessageSquare, Settings, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Calendar, Scissors, Users, MessageSquare, Settings, Menu, X, LogOut } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
