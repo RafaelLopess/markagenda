@@ -14,7 +14,150 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      appointments: {
+        Row: {
+          client_id: string | null
+          client_name: string
+          client_phone: string
+          created_at: string
+          date: string
+          id: string
+          price: number
+          service_id: string | null
+          service_name: string
+          status: string
+          time: string
+          user_id: string
+        }
+        Insert: {
+          client_id?: string | null
+          client_name: string
+          client_phone?: string
+          created_at?: string
+          date: string
+          id?: string
+          price?: number
+          service_id?: string | null
+          service_name: string
+          status?: string
+          time: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string | null
+          client_name?: string
+          client_phone?: string
+          created_at?: string
+          date?: string
+          id?: string
+          price?: number
+          service_id?: string | null
+          service_name?: string
+          status?: string
+          time?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          created_at: string
+          id: string
+          last_visit: string | null
+          name: string
+          phone: string
+          total_spent: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_visit?: string | null
+          name: string
+          phone?: string
+          total_spent?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_visit?: string | null
+          name?: string
+          phone?: string
+          total_spent?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          business_name: string | null
+          created_at: string
+          id: string
+          name: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          business_name?: string | null
+          created_at?: string
+          id: string
+          name?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          business_name?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          created_at: string
+          duration: number
+          id: string
+          name: string
+          price: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration?: number
+          id?: string
+          name: string
+          price?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          duration?: number
+          id?: string
+          name?: string
+          price?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
