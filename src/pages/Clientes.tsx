@@ -1,70 +1,146 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Phone, Calendar, DollarSign, Plus } from 'lucide-react';
+import { Search, Phone, Calendar, Plus, History, RefreshCw, MessageCircle } from 'lucide-react';
 import Layout from '@/components/Layout';
-import { useClients, useAddClient } from '@/hooks/useSupabaseData';
+import { useClients, useAddClient, useAppointments, useServices, useAddAppointment, type Client } from '@/hooks/useSupabaseData';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { format, addDays } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+
+const timeSlots = [
+  '08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30',
+  '12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30',
+  '16:00','16:30','17:00','17:30','18:00','18:30','19:00',
+];
 
 const Clientes = () => {
   const { data: clients = [], isLoading } = useClients();
+  const { data: allAppointments = [] } = useAppointments();
+  const { data: services = [] } = useServices();
   const addClient = useAddClient();
-  const [search, setSearch] = useState('');
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
+  const addAppointment = useAddAppointment();
   const { toast } = useToast();
 
+  const [search, setSearch] = useState('');
+  const [openNew, setOpenNew] = useState(false);
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+
+  const [historyClient, setHistoryClient] = useState<Client | null>(null);
+  const [rebookClient, setRebookClient] = useState<Client | null>(null);
+  const [serviceId, setServiceId] = useState('');
+  const [date, setDate] = useState(format(addDays(new Date(), 1), 'yyyy-MM-dd'));
+  const [time, setTime] = useState('');
+
+  const aptsByClient = useMemo(() => {
+    const map = new Map<string, typeof allAppointments>();
+    allAppointments.forEach(a => {
+      if (!a.client_id) return;
+      const arr = map.get(a.client_id) ?? [];
+      arr.push(a);
+      map.set(a.client_id, arr);
+    });
+    return map;
+  }, [allAppointments]);
+
   const filtered = clients.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase()) ||
-    c.phone.includes(search)
+    c.name.toLowerCase().includes(search.toLowerCase()) || c.phone.includes(search)
   );
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await addClient.mutateAsync({ name, phone });
-      setName(''); setPhone('');
-      setOpen(false);
-      toast({ title: 'Cliente adicionado!' });
-    } catch {
-      toast({ title: 'Erro ao adicionar cliente', variant: 'destructive' });
+    const cleanName = name.trim();
+    const cleanPhone = phone.trim();
+    if (!cleanName) {
+      toast({ title: 'Informe o nome do cliente', variant: 'destructive' });
+      return;
     }
+    try {
+      await addClient.mutateAsync({ name: cleanName, phone: cleanPhone });
+      setName(''); setPhone(''); setOpenNew(false);
+      toast({ title: 'Cliente cadastrado!' });
+    } catch {
+      toast({ title: 'Erro ao cadastrar cliente', variant: 'destructive' });
+    }
+  };
+
+  const handleRebook = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!rebookClient) return;
+    const service = services.find(s => s.id === serviceId);
+    if (!service || !time) {
+      toast({ title: 'Selecione serviço e horário', variant: 'destructive' });
+      return;
+    }
+    try {
+      await addAppointment.mutateAsync({
+        client_id: rebookClient.id,
+        service_id: service.id,
+        client_name: rebookClient.name,
+        client_phone: rebookClient.phone,
+        service_name: service.name,
+        price: Number(service.price),
+        date,
+        time: time + ':00',
+        status: 'confirmed',
+      });
+      setRebookClient(null); setServiceId(''); setTime('');
+      toast({ title: 'Re-agendamento criado!' });
+    } catch {
+      toast({ title: 'Erro ao re-agendar', variant: 'destructive' });
+    }
+  };
+
+  const openRebook = (client: Client) => {
+    const last = aptsByClient.get(client.id)?.[0];
+    setRebookClient(client);
+    setServiceId(last?.service_id ?? '');
+    setTime('');
+    setDate(format(addDays(new Date(), 7), 'yyyy-MM-dd'));
+  };
+
+  const whatsappLink = (client: Client) => {
+    const digits = client.phone.replace(/\D/g, '');
+    const msg = encodeURIComponent(`Olá ${client.name}, tudo bem? Que tal agendar seu próximo corte?`);
+    return `https://wa.me/55${digits}?text=${msg}`;
   };
 
   return (
     <Layout>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h1 className="text-3xl font-display font-bold text-foreground">Clientes</h1>
-            <p className="text-muted-foreground mt-1">Sua base de clientes</p>
+            <p className="text-muted-foreground mt-1">Cadastro rápido + histórico para fidelizar</p>
           </div>
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog open={openNew} onOpenChange={setOpenNew}>
             <DialogTrigger asChild>
               <Button className="bg-gradient-gold text-accent-foreground font-semibold shadow-gold hover:opacity-90">
-                <Plus className="w-4 h-4 mr-2" />
-                Novo Cliente
+                <Plus className="w-4 h-4 mr-2" /> Novo Cliente
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-card border-border">
               <DialogHeader>
-                <DialogTitle className="font-display">Adicionar Cliente</DialogTitle>
+                <DialogTitle className="font-display">Cadastro rápido</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleAdd} className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Nome</Label>
-                  <Input value={name} onChange={e => setName(e.target.value)} placeholder="Nome do cliente" required className="bg-secondary border-border" />
+                  <Label>Nome *</Label>
+                  <Input value={name} onChange={e => setName(e.target.value)} placeholder="Ex: João Silva" required maxLength={100} className="bg-secondary border-border" autoFocus />
                 </div>
                 <div className="space-y-2">
-                  <Label>Telefone</Label>
-                  <Input value={phone} onChange={e => setPhone(e.target.value)} placeholder="(11) 99999-9999" required className="bg-secondary border-border" />
+                  <Label>Telefone (WhatsApp)</Label>
+                  <Input value={phone} onChange={e => setPhone(e.target.value)} placeholder="(11) 99999-9999" maxLength={20} inputMode="tel" className="bg-secondary border-border" />
+                  <p className="text-xs text-muted-foreground">Opcional, mas necessário para enviar lembretes.</p>
                 </div>
                 <Button type="submit" disabled={addClient.isPending} className="w-full bg-gradient-gold text-accent-foreground font-semibold shadow-gold hover:opacity-90">
-                  {addClient.isPending ? 'Salvando...' : 'Adicionar'}
+                  {addClient.isPending ? 'Salvando...' : 'Cadastrar'}
                 </Button>
               </form>
             </DialogContent>
@@ -73,7 +149,7 @@ const Clientes = () => {
 
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Buscar cliente..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10 bg-card border-border" />
+          <Input placeholder="Buscar por nome ou telefone..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10 bg-card border-border" />
         </div>
 
         {isLoading ? (
@@ -81,78 +157,150 @@ const Clientes = () => {
             <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            <p>{clients.length === 0 ? 'Nenhum cliente cadastrado ainda.' : 'Nenhum cliente encontrado.'}</p>
+          <div className="text-center py-16 text-muted-foreground border border-dashed border-border rounded-xl">
+            <p className="mb-3">{clients.length === 0 ? 'Nenhum cliente cadastrado ainda.' : 'Nenhum cliente encontrado.'}</p>
+            {clients.length === 0 && (
+              <Button onClick={() => setOpenNew(true)} variant="outline">
+                <Plus className="w-4 h-4 mr-2" /> Cadastrar primeiro cliente
+              </Button>
+            )}
           </div>
         ) : (
-          <div className="bg-card border border-border rounded-xl shadow-card overflow-hidden">
-            {/* Desktop table */}
-            <table className="w-full hidden md:table">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cliente</th>
-                  <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Telefone</th>
-                  <th className="text-left p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Última Visita</th>
-                  <th className="text-right p-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Gasto</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((client, i) => (
-                  <motion.tr
-                    key={client.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: i * 0.05 }}
-                    className="border-b border-border last:border-0 hover:bg-secondary/50 transition-colors"
-                  >
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
-                          <span className="text-sm font-semibold text-primary">{client.name[0]}</span>
-                        </div>
-                        <span className="text-sm font-medium text-foreground">{client.name}</span>
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                        <Phone className="w-3.5 h-3.5" />
-                        {client.phone}
-                      </div>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                        <Calendar className="w-3.5 h-3.5" />
-                        {client.last_visit ? new Date(client.last_visit).toLocaleDateString('pt-BR') : '—'}
-                      </div>
-                    </td>
-                    <td className="p-4 text-right">
-                      <span className="text-sm font-semibold text-primary">R$ {Number(client.total_spent).toFixed(2)}</span>
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
-
-            {/* Mobile cards */}
-            <div className="md:hidden divide-y divide-border">
-              {filtered.map((client) => (
-                <div key={client.id} className="p-4 space-y-2">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="text-sm font-semibold text-primary">{client.name[0]}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filtered.map((client, i) => {
+              const apts = aptsByClient.get(client.id) ?? [];
+              const visits = apts.length;
+              const last = apts[0];
+              return (
+                <motion.div
+                  key={client.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  className="bg-card border border-border rounded-xl p-4 shadow-card hover:border-primary/40 transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="w-11 h-11 rounded-full bg-gradient-gold flex items-center justify-center shrink-0">
+                      <span className="text-base font-semibold text-accent-foreground">{client.name[0]?.toUpperCase()}</span>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{client.name}</p>
-                      <p className="text-xs text-muted-foreground">{client.phone}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-foreground truncate">{client.name}</p>
+                      {client.phone && (
+                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                          <Phone className="w-3 h-3" /> {client.phone}
+                        </p>
+                      )}
                     </div>
-                    <span className="ml-auto text-sm font-semibold text-primary">R$ {Number(client.total_spent).toFixed(2)}</span>
+                    <Badge variant="secondary" className="text-xs">{visits} {visits === 1 ? 'visita' : 'visitas'}</Badge>
                   </div>
-                </div>
-              ))}
-            </div>
+
+                  <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                    <div className="bg-secondary/50 rounded-lg px-3 py-2">
+                      <p className="text-muted-foreground">Última visita</p>
+                      <p className="text-foreground font-medium mt-0.5 flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {last ? format(new Date(last.date), 'dd/MM/yy') : '—'}
+                      </p>
+                    </div>
+                    <div className="bg-secondary/50 rounded-lg px-3 py-2">
+                      <p className="text-muted-foreground">Total gasto</p>
+                      <p className="text-primary font-semibold mt-0.5">R$ {Number(client.total_spent).toFixed(2)}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 mt-3">
+                    <Button size="sm" variant="outline" className="flex-1" onClick={() => setHistoryClient(client)}>
+                      <History className="w-3.5 h-3.5 mr-1" /> Histórico
+                    </Button>
+                    <Button size="sm" className="flex-1 bg-gradient-gold text-accent-foreground hover:opacity-90" onClick={() => openRebook(client)}>
+                      <RefreshCw className="w-3.5 h-3.5 mr-1" /> Re-agendar
+                    </Button>
+                    {client.phone && (
+                      <Button size="sm" variant="outline" asChild>
+                        <a href={whatsappLink(client)} target="_blank" rel="noopener noreferrer" aria-label="Enviar WhatsApp">
+                          <MessageCircle className="w-3.5 h-3.5" />
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         )}
       </motion.div>
+
+      {/* Histórico */}
+      <Dialog open={!!historyClient} onOpenChange={(o) => !o && setHistoryClient(null)}>
+        <DialogContent className="bg-card border-border max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-display">Histórico — {historyClient?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto space-y-2">
+            {historyClient && (aptsByClient.get(historyClient.id) ?? []).length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">Nenhum atendimento registrado ainda.</p>
+            ) : (
+              historyClient && (aptsByClient.get(historyClient.id) ?? []).map(a => (
+                <div key={a.id} className="flex items-center justify-between bg-secondary/50 rounded-lg px-3 py-2.5">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{a.service_name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {format(new Date(a.date), "dd 'de' MMM yyyy", { locale: ptBR })} às {a.time.slice(0,5)}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-primary">R$ {Number(a.price).toFixed(2)}</p>
+                    <Badge variant="outline" className="text-[10px] mt-0.5">{a.status}</Badge>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          {historyClient && (
+            <Button onClick={() => { const c = historyClient; setHistoryClient(null); openRebook(c); }} className="w-full bg-gradient-gold text-accent-foreground hover:opacity-90">
+              <RefreshCw className="w-4 h-4 mr-2" /> Re-agendar agora
+            </Button>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Re-agendar */}
+      <Dialog open={!!rebookClient} onOpenChange={(o) => !o && setRebookClient(null)}>
+        <DialogContent className="bg-card border-border">
+          <DialogHeader>
+            <DialogTitle className="font-display">Re-agendar — {rebookClient?.name}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleRebook} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Serviço</Label>
+              <Select value={serviceId} onValueChange={setServiceId}>
+                <SelectTrigger className="bg-secondary border-border"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  {services.map(s => <SelectItem key={s.id} value={s.id}>{s.name} — R$ {Number(s.price).toFixed(2)}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label>Data</Label>
+                <Input type="date" value={date} onChange={e => setDate(e.target.value)} className="bg-secondary border-border" />
+              </div>
+              <div className="space-y-2">
+                <Label>Horário</Label>
+                <Select value={time} onValueChange={setTime}>
+                  <SelectTrigger className="bg-secondary border-border"><SelectValue placeholder="—" /></SelectTrigger>
+                  <SelectContent>
+                    {timeSlots.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <Button type="submit" disabled={addAppointment.isPending} className="w-full bg-gradient-gold text-accent-foreground font-semibold shadow-gold hover:opacity-90">
+              {addAppointment.isPending ? 'Salvando...' : 'Confirmar agendamento'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
