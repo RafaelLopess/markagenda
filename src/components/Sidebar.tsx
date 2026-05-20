@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Calendar, Scissors, Users, MessageSquare, Settings, Menu, X, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import Logo from '@/components/Logo';
 
 const navItems = [
   { to: '/app', icon: LayoutDashboard, label: 'Dashboard' },
@@ -70,8 +71,8 @@ const Sidebar = () => {
 
         <div className="p-4 border-t border-border">
           <div className="flex items-center gap-3 px-4 py-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-gold flex items-center justify-center">
-              <Scissors className="w-4 h-4 text-accent-foreground" />
+            <div className="w-9 h-9 rounded-full bg-gradient-gold flex items-center justify-center text-accent-foreground">
+              <Logo className="w-4 h-4" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground truncate">{user?.user_metadata?.name || 'Profissional'}</p>

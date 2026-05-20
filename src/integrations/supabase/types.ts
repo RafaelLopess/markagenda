@@ -22,7 +22,10 @@ export type Database = {
           created_at: string
           date: string
           id: string
+          parcelas_pagas: number
+          parcelas_total: number
           price: number
+          sala: string | null
           service_id: string | null
           service_name: string
           status: string
@@ -36,7 +39,10 @@ export type Database = {
           created_at?: string
           date: string
           id?: string
+          parcelas_pagas?: number
+          parcelas_total?: number
           price?: number
+          sala?: string | null
           service_id?: string | null
           service_name: string
           status?: string
@@ -50,7 +56,10 @@ export type Database = {
           created_at?: string
           date?: string
           id?: string
+          parcelas_pagas?: number
+          parcelas_total?: number
           price?: number
+          sala?: string | null
           service_id?: string | null
           service_name?: string
           status?: string

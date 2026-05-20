@@ -1,16 +1,17 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
-  Scissors,
   Calendar,
   MessageSquare,
   TrendingUp,
   Users,
   CheckCircle2,
   Clock,
+  Scissors,
   Zap,
   ArrowRight,
 } from 'lucide-react';
+import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 
 const features = [
@@ -60,7 +61,7 @@ const Landing = () => {
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-xl bg-gradient-gold flex items-center justify-center shadow-gold">
-              <Scissors className="w-5 h-5 text-accent-foreground" />
+              <Logo className="w-5 h-5 text-accent-foreground" />
             </div>
             <span className="font-display text-xl font-bold text-gradient-gold">MarkAgenda</span>
           </div>
@@ -272,7 +273,7 @@ const Landing = () => {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-gradient-gold flex items-center justify-center">
-              <Scissors className="w-4 h-4 text-accent-foreground" />
+              <Logo className="w-4 h-4 text-accent-foreground" />
             </div>
             <span className="font-display font-semibold text-foreground">MarkAgenda</span>
           </div>

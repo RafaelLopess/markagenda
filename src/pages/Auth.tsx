@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Scissors, Mail, Lock, User } from 'lucide-react';
+import { Mail, Lock, User } from 'lucide-react';
+import Logo from '@/components/Logo';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,8 +58,8 @@ const Auth = () => {
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-gold flex items-center justify-center mx-auto mb-4 shadow-gold">
-            <Scissors className="w-8 h-8 text-accent-foreground" />
+          <div className="w-16 h-16 rounded-2xl bg-gradient-gold flex items-center justify-center mx-auto mb-4 shadow-gold text-accent-foreground">
+            <Logo className="w-8 h-8" />
           </div>
           <h1 className="font-display text-3xl font-bold text-gradient-gold">MarkAgenda</h1>
           <p className="text-muted-foreground mt-2">Agenda inteligente para barbearias e clínicas</p>
