@@ -150,3 +150,17 @@ export const useUpdateAppointmentStatus = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['appointments'] }),
   });
 };
+
+export const useUpdateAppointmentParcelas = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, parcelas_pagas }: { id: string; parcelas_pagas: number }) => {
+      const { error } = await supabase
+        .from('appointments')
+        .update({ parcelas_pagas })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['appointments'] }),
+  });
+};
