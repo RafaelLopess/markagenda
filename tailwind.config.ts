@@ -13,7 +13,7 @@ export default {
       },
     },
     fontFamily: {
-      display: ['Playfair Display', 'serif'],
+      display: ['Plus Jakarta Sans', 'sans-serif'],
       body: ['Inter', 'sans-serif'],
     },
     extend: {
