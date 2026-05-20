@@ -14,19 +14,19 @@ import {
 import { Button } from '@/components/ui/button';
 
 const features = [
-  { icon: Calendar, title: 'Agenda inteligente', desc: 'Veja todos os horários do dia em segundos. Crie, edite e cancele com um clique.' },
-  { icon: MessageSquare, title: 'WhatsApp automático', desc: 'Confirmações e lembretes enviados sozinhos. Zero falta de cliente.' },
-  { icon: TrendingUp, title: 'Faturamento em tempo real', desc: 'Saiba quanto você ganhou hoje, na semana e no mês. Sem planilha.' },
-  { icon: Users, title: 'Cadastro de clientes', desc: 'Histórico completo de cada cliente, serviços feitos e total gasto.' },
-  { icon: Scissors, title: 'Catálogo de serviços', desc: 'Cadastre seus serviços com preço e duração. Tudo organizado.' },
-  { icon: Clock, title: 'Economize 2h por dia', desc: 'Pare de responder WhatsApp manualmente. Foque em cortar cabelo.' },
+  { icon: Calendar, title: 'Agenda inteligente', desc: 'Veja todos os atendimentos do dia em segundos. Crie, edite e cancele com um clique.' },
+  { icon: MessageSquare, title: 'WhatsApp automático', desc: 'Confirmações e lembretes enviados sozinhos. Reduza faltas e remarcações.' },
+  { icon: TrendingUp, title: 'Faturamento em tempo real', desc: 'Saiba quanto você faturou hoje, na semana e no mês. Sem planilha.' },
+  { icon: Users, title: 'Cadastro de clientes e pacientes', desc: 'Histórico completo de cada pessoa, serviços realizados e total gasto.' },
+  { icon: Scissors, title: 'Catálogo de serviços', desc: 'Cadastre seus serviços ou procedimentos com preço e duração.' },
+  { icon: Clock, title: 'Economize horas por dia', desc: 'Pare de responder WhatsApp manualmente. Foque no atendimento.' },
 ];
 
 const plans = [
   {
     name: 'Básico',
     price: 39,
-    desc: 'Para quem está começando a organizar a barbearia.',
+    desc: 'Para quem está começando a organizar a agenda.',
     features: [
       'Agenda online ilimitada',
       'Cadastro de clientes e serviços',
@@ -39,7 +39,7 @@ const plans = [
   {
     name: 'Pro',
     price: 79,
-    desc: 'O plano completo. Para barbeiros que querem crescer.',
+    desc: 'O plano completo. Para quem quer crescer.',
     features: [
       'Tudo do Básico, mais:',
       'WhatsApp automático (confirmações + lembretes)',
@@ -62,7 +62,7 @@ const Landing = () => {
             <div className="w-9 h-9 rounded-xl bg-gradient-gold flex items-center justify-center shadow-gold">
               <Scissors className="w-5 h-5 text-accent-foreground" />
             </div>
-            <span className="font-display text-xl font-bold text-gradient-gold">BarberPro</span>
+            <span className="font-display text-xl font-bold text-gradient-gold">MarkAgenda</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
             <a href="#recursos" className="hover:text-primary transition-colors">Recursos</a>
@@ -84,7 +84,7 @@ const Landing = () => {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border text-sm text-muted-foreground mb-8"
           >
             <Zap className="w-4 h-4 text-primary" />
-            Gestão completa para barbeiros autônomos
+            Gestão completa para barbearias e clínicas
           </motion.div>
 
           <motion.h1
@@ -93,7 +93,7 @@ const Landing = () => {
             transition={{ delay: 0.1 }}
             className="font-display text-5xl md:text-7xl font-bold leading-tight mb-6"
           >
-            Sua barbearia <br />
+            Sua agenda <br />
             <span className="text-gradient-gold">profissional como nunca.</span>
           </motion.h1>
 
@@ -103,8 +103,7 @@ const Landing = () => {
             transition={{ delay: 0.2 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            Agenda inteligente, confirmação automática no WhatsApp e relatórios de faturamento.
-            Tudo num só lugar, sem planilha e sem complicação.
+            Agenda inteligente, confirmação automática no WhatsApp e relatórios de faturamento para barbearias e clínicas. Tudo num só lugar, sem planilha e sem complicação.
           </motion.p>
 
           <motion.div
@@ -143,7 +142,7 @@ const Landing = () => {
               Tudo o que você precisa <span className="text-gradient-gold">num lugar só</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Pare de perder tempo (e dinheiro) com WhatsApp e caderninho. Centralize sua barbearia.
+              Pare de perder tempo (e dinheiro) com WhatsApp e caderninho. Centralize seu atendimento.
             </p>
           </div>
 
@@ -232,9 +231,10 @@ const Landing = () => {
           </div>
           <div className="space-y-4">
             {[
-              { q: 'Preciso saber mexer com tecnologia?', a: 'Não. O BarberPro foi feito para ser usado direto do celular, sem treinamento. Se você usa WhatsApp, consegue usar.' },
+              { q: 'Serve para barbearia e para clínica?', a: 'Sim. O MarkAgenda foi feito para qualquer profissional que trabalha com hora marcada — barbearias, clínicas, estética, terapias e consultórios.' },
+              { q: 'Preciso saber mexer com tecnologia?', a: 'Não. O MarkAgenda foi feito para ser usado direto do celular, sem treinamento. Se você usa WhatsApp, consegue usar.' },
               { q: 'Posso cancelar quando quiser?', a: 'Sim. A assinatura é mensal e você cancela a qualquer momento direto no painel. Sem multa, sem fidelidade.' },
-              { q: 'Meus clientes precisam baixar algum app?', a: 'Não. Eles agendam pelo link da sua barbearia (no plano Pro) ou recebem confirmação direto no WhatsApp.' },
+              { q: 'Meus clientes precisam baixar algum app?', a: 'Não. Eles agendam pelo seu link público (no plano Pro) ou recebem confirmação direto no WhatsApp.' },
               { q: 'Como funciona o pagamento?', a: 'Cobrança mensal automática no cartão de crédito. Você recebe nota fiscal por e-mail.' },
             ].map((item) => (
               <div key={item.q} className="bg-card border border-border rounded-xl p-6">
@@ -250,10 +250,10 @@ const Landing = () => {
       <section className="py-24 px-6 border-t border-border">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-6">
-            Pronto pra <span className="text-gradient-gold">profissionalizar</span> sua barbearia?
+            Pronto pra <span className="text-gradient-gold">profissionalizar</span> seu atendimento?
           </h2>
           <p className="text-muted-foreground mb-8 text-lg">
-            Junte-se aos barbeiros que pararam de perder cliente por desorganização.
+            Junte-se aos profissionais que pararam de perder cliente por desorganização.
           </p>
           <Link to="/app">
             <Button
@@ -274,9 +274,9 @@ const Landing = () => {
             <div className="w-7 h-7 rounded-lg bg-gradient-gold flex items-center justify-center">
               <Scissors className="w-4 h-4 text-accent-foreground" />
             </div>
-            <span className="font-display font-semibold text-foreground">BarberPro</span>
+            <span className="font-display font-semibold text-foreground">MarkAgenda</span>
           </div>
-          <p>© {new Date().getFullYear()} BarberPro. Todos os direitos reservados.</p>
+          <p>© {new Date().getFullYear()} MarkAgenda. Todos os direitos reservados.</p>
         </div>
       </footer>
     </div>

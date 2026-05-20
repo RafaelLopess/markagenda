@@ -32,7 +32,7 @@ const Index = () => {
     return 'Boa noite';
   };
 
-  const userName = user?.user_metadata?.name || 'Barbeiro';
+  const userName = user?.user_metadata?.name || 'Profissional';
 
   return (
     <Layout>

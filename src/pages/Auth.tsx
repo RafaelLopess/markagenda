@@ -60,8 +60,8 @@ const Auth = () => {
           <div className="w-16 h-16 rounded-2xl bg-gradient-gold flex items-center justify-center mx-auto mb-4 shadow-gold">
             <Scissors className="w-8 h-8 text-accent-foreground" />
           </div>
-          <h1 className="font-display text-3xl font-bold text-gradient-gold">BarberPro</h1>
-          <p className="text-muted-foreground mt-2">Gestão Inteligente para Barbeiros</p>
+          <h1 className="font-display text-3xl font-bold text-gradient-gold">MarkAgenda</h1>
+          <p className="text-muted-foreground mt-2">Agenda inteligente para barbearias e clínicas</p>
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-8 shadow-card">
