@@ -22,8 +22,8 @@ const Configuracoes = () => {
           </div>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-muted-foreground">Nome da Barbearia</Label>
-              <Input defaultValue="Barbearia do João" className="bg-secondary border-border" />
+              <Label className="text-muted-foreground">Nome do Estabelecimento</Label>
+              <Input defaultValue="Meu Estabelecimento" className="bg-secondary border-border" />
             </div>
             <div className="space-y-2">
               <Label className="text-muted-foreground">Seu Nome</Label>

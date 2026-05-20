@@ -23,7 +23,7 @@ const Sidebar = () => {
         <button onClick={() => setOpen(true)} className="p-2 -ml-2 text-foreground">
           <Menu className="w-6 h-6" />
         </button>
-        <h1 className="font-display text-xl font-bold text-gradient-gold ml-3">BarberPro</h1>
+        <h1 className="font-display text-xl font-bold text-gradient-gold ml-3">MarkAgenda</h1>
       </header>
 
       {/* Overlay */}
@@ -39,7 +39,7 @@ const Sidebar = () => {
       >
         <div className="p-6 border-b border-border flex items-center justify-between">
           <div>
-            <h1 className="font-display text-2xl font-bold text-gradient-gold">BarberPro</h1>
+            <h1 className="font-display text-2xl font-bold text-gradient-gold">MarkAgenda</h1>
             <p className="text-muted-foreground text-xs mt-1 font-body">Gestão Inteligente</p>
           </div>
           <button onClick={() => setOpen(false)} className="p-1 text-muted-foreground lg:hidden">
@@ -74,7 +74,7 @@ const Sidebar = () => {
               <Scissors className="w-4 h-4 text-accent-foreground" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">{user?.user_metadata?.name || 'Barbeiro'}</p>
+              <p className="text-sm font-medium text-foreground truncate">{user?.user_metadata?.name || 'Profissional'}</p>
               <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
             </div>
             <button onClick={signOut} className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors" title="Sair">
