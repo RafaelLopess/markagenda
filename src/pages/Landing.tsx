@@ -1,16 +1,17 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
-  Scissors,
   Calendar,
   MessageSquare,
   TrendingUp,
   Users,
   CheckCircle2,
   Clock,
+  Scissors,
   Zap,
   ArrowRight,
 } from 'lucide-react';
+import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 
 const features = [
