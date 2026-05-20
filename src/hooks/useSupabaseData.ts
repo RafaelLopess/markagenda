@@ -33,6 +33,9 @@ export interface Appointment {
   date: string;
   time: string;
   status: 'confirmed' | 'pending' | 'completed' | 'cancelled';
+  sala: string | null;
+  parcelas_total: number;
+  parcelas_pagas: number;
   created_at: string;
 }
 
@@ -126,6 +129,9 @@ export const useAddAppointment = () => {
       status?: string;
       client_id?: string;
       service_id?: string;
+      sala?: string | null;
+      parcelas_total?: number;
+      parcelas_pagas?: number;
     }) => {
       const { error } = await supabase.from('appointments').insert({ ...apt, user_id: user!.id });
       if (error) throw error;
