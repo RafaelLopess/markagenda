@@ -72,11 +72,19 @@ const Auth = () => {
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-8 shadow-card">
-          <h2 className="font-display text-xl font-semibold text-foreground mb-6">
-            {isLogin ? 'Entrar na sua conta' : 'Criar sua conta'}
+          <h2 className="font-display text-xl font-semibold text-foreground mb-2">
+            {isLogin ? 'Entrar na sua conta' : 'Criar sua conta grátis'}
           </h2>
+          {!isLogin && trialAllowed && (
+            <div className="flex items-center gap-2 text-sm text-primary bg-primary/10 border border-primary/20 rounded-lg px-3 py-2 mb-6">
+              <Sparkles className="w-4 h-4 shrink-0" />
+              <span>7 dias de acesso completo · sem cartão</span>
+            </div>
+          )}
+          {isLogin && <div className="mb-6" />}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+
             {!isLogin && (
               <div className="space-y-2">
                 <Label htmlFor="name">Nome</Label>
