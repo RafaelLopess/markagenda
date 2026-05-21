@@ -25,8 +25,25 @@ const features = [
 
 const plans = [
   {
+    name: 'Teste grátis',
+    priceLabel: 'R$ 0',
+    period: 'por 7 dias',
+    desc: 'Experimente tudo sem compromisso. Único caminho para criar conta.',
+    features: [
+      'Acesso completo por 7 dias',
+      'Agenda, clientes e serviços',
+      'Dashboard de faturamento',
+      'Sem cartão de crédito',
+    ],
+    highlight: false,
+    cta: 'Começar grátis por 7 dias',
+    href: '/app?signup=trial',
+    isTrial: true,
+  },
+  {
     name: 'Básico',
-    price: 39,
+    priceLabel: 'R$ 39',
+    period: '/mês',
     desc: 'Para quem está começando a organizar a agenda.',
     features: [
       'Agenda online ilimitada',
@@ -35,11 +52,14 @@ const plans = [
       'Suporte por e-mail',
     ],
     highlight: false,
-    cta: 'Começar com Básico',
+    cta: 'Assinar Básico',
+    href: '/app',
+    isTrial: false,
   },
   {
     name: 'Pro',
-    price: 79,
+    priceLabel: 'R$ 79',
+    period: '/mês',
     desc: 'O plano completo. Para quem quer crescer.',
     features: [
       'Tudo do Básico, mais:',
@@ -50,6 +70,8 @@ const plans = [
     ],
     highlight: true,
     cta: 'Assinar plano Pro',
+    href: '/app',
+    isTrial: false,
   },
 ];
 
@@ -113,12 +135,12 @@ const Landing = () => {
             transition={{ delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Link to="/app">
+            <Link to="/app?signup=trial">
               <Button
                 size="lg"
                 className="bg-gradient-gold text-accent-foreground font-semibold shadow-gold hover:opacity-90 px-8 h-12"
               >
-                Começar agora
+                Começar grátis por 7 dias
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
@@ -178,12 +200,12 @@ const Landing = () => {
             <p className="text-muted-foreground">Sem letras miúdas. Cancele quando quiser.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {plans.map((p) => (
               <div
                 key={p.name}
                 className={`relative bg-card rounded-2xl p-8 shadow-card border-2 ${
-                  p.highlight ? 'border-primary shadow-gold' : 'border-border'
+                  p.highlight ? 'border-primary shadow-gold' : p.isTrial ? 'border-primary/40' : 'border-border'
                 }`}
               >
                 {p.highlight && (
@@ -191,11 +213,16 @@ const Landing = () => {
                     MAIS POPULAR
                   </div>
                 )}
+                {p.isTrial && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary/10 text-primary border border-primary/30 text-xs font-bold px-3 py-1 rounded-full">
+                    COMECE POR AQUI
+                  </div>
+                )}
                 <h3 className="font-display text-2xl font-bold mb-1">{p.name}</h3>
                 <p className="text-sm text-muted-foreground mb-6">{p.desc}</p>
                 <div className="mb-6">
-                  <span className="text-5xl font-bold">R$ {p.price}</span>
-                  <span className="text-muted-foreground">/mês</span>
+                  <span className="text-5xl font-bold">{p.priceLabel}</span>
+                  <span className="text-muted-foreground"> {p.period}</span>
                 </div>
                 <ul className="space-y-3 mb-8">
                   {p.features.map((feat) => (
@@ -205,10 +232,10 @@ const Landing = () => {
                     </li>
                   ))}
                 </ul>
-                <Link to="/app" className="block">
+                <Link to={p.href} className="block">
                   <Button
                     className={`w-full h-11 ${
-                      p.highlight
+                      p.highlight || p.isTrial
                         ? 'bg-gradient-gold text-accent-foreground font-semibold shadow-gold hover:opacity-90'
                         : 'bg-secondary text-foreground hover:bg-secondary/80'
                     }`}
@@ -219,6 +246,7 @@ const Landing = () => {
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
@@ -256,12 +284,12 @@ const Landing = () => {
           <p className="text-muted-foreground mb-8 text-lg">
             Junte-se aos profissionais que pararam de perder cliente por desorganização.
           </p>
-          <Link to="/app">
+          <Link to="/app?signup=trial">
             <Button
               size="lg"
               className="bg-gradient-gold text-accent-foreground font-semibold shadow-gold hover:opacity-90 px-10 h-12"
             >
-              Criar minha conta grátis
+              Começar grátis por 7 dias
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>

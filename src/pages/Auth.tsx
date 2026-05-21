@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Mail, Lock, User, Sparkles } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,9 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [searchParams] = useSearchParams();
+  const trialAllowed = searchParams.get('signup') === 'trial';
+  const [isLogin, setIsLogin] = useState(!trialAllowed);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,6 +28,9 @@ const Auth = () => {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       } else {
+        if (!trialAllowed) {
+          throw new Error('Para criar uma conta, escolha o plano de teste grátis na página inicial.');
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -35,7 +41,7 @@ const Auth = () => {
         });
         if (error) throw error;
         toast({
-          title: 'Cadastro realizado!',
+          title: 'Conta criada! 7 dias grátis liberados',
           description: 'Verifique seu e-mail para confirmar a conta.',
         });
       }
@@ -66,11 +72,19 @@ const Auth = () => {
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-8 shadow-card">
-          <h2 className="font-display text-xl font-semibold text-foreground mb-6">
-            {isLogin ? 'Entrar na sua conta' : 'Criar sua conta'}
+          <h2 className="font-display text-xl font-semibold text-foreground mb-2">
+            {isLogin ? 'Entrar na sua conta' : 'Criar sua conta grátis'}
           </h2>
+          {!isLogin && trialAllowed && (
+            <div className="flex items-center gap-2 text-sm text-primary bg-primary/10 border border-primary/20 rounded-lg px-3 py-2 mb-6">
+              <Sparkles className="w-4 h-4 shrink-0" />
+              <span>7 dias de acesso completo · sem cartão</span>
+            </div>
+          )}
+          {isLogin && <div className="mb-6" />}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+
             {!isLogin && (
               <div className="space-y-2">
                 <Label htmlFor="name">Nome</Label>
@@ -130,13 +144,22 @@ const Auth = () => {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              {isLogin ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Faça login'}
-            </button>
+          <div className="mt-6 text-center text-sm">
+            {isLogin ? (
+              <Link
+                to="/#planos"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Não tem conta? <span className="font-semibold text-primary">Comece grátis por 7 dias</span>
+              </Link>
+            ) : (
+              <button
+                onClick={() => setIsLogin(true)}
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Já tem conta? Faça login
+              </button>
+            )}
           </div>
         </div>
       </motion.div>
