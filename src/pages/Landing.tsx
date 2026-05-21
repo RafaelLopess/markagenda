@@ -135,12 +135,12 @@ const Landing = () => {
             transition={{ delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Link to="/app">
+            <Link to="/app?signup=trial">
               <Button
                 size="lg"
                 className="bg-gradient-gold text-accent-foreground font-semibold shadow-gold hover:opacity-90 px-8 h-12"
               >
-                Começar agora
+                Começar grátis por 7 dias
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
