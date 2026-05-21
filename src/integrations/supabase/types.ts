@@ -120,6 +120,7 @@ export type Database = {
           id: string
           name: string
           phone: string | null
+          trial_ends_at: string
           updated_at: string
         }
         Insert: {
@@ -128,6 +129,7 @@ export type Database = {
           id: string
           name?: string
           phone?: string | null
+          trial_ends_at?: string
           updated_at?: string
         }
         Update: {
@@ -136,6 +138,7 @@ export type Database = {
           id?: string
           name?: string
           phone?: string | null
+          trial_ends_at?: string
           updated_at?: string
         }
         Relationships: []
