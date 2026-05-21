@@ -200,12 +200,12 @@ const Landing = () => {
             <p className="text-muted-foreground">Sem letras miúdas. Cancele quando quiser.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {plans.map((p) => (
               <div
                 key={p.name}
                 className={`relative bg-card rounded-2xl p-8 shadow-card border-2 ${
-                  p.highlight ? 'border-primary shadow-gold' : 'border-border'
+                  p.highlight ? 'border-primary shadow-gold' : p.isTrial ? 'border-primary/40' : 'border-border'
                 }`}
               >
                 {p.highlight && (
@@ -213,11 +213,16 @@ const Landing = () => {
                     MAIS POPULAR
                   </div>
                 )}
+                {p.isTrial && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary/10 text-primary border border-primary/30 text-xs font-bold px-3 py-1 rounded-full">
+                    COMECE POR AQUI
+                  </div>
+                )}
                 <h3 className="font-display text-2xl font-bold mb-1">{p.name}</h3>
                 <p className="text-sm text-muted-foreground mb-6">{p.desc}</p>
                 <div className="mb-6">
-                  <span className="text-5xl font-bold">R$ {p.price}</span>
-                  <span className="text-muted-foreground">/mês</span>
+                  <span className="text-5xl font-bold">{p.priceLabel}</span>
+                  <span className="text-muted-foreground"> {p.period}</span>
                 </div>
                 <ul className="space-y-3 mb-8">
                   {p.features.map((feat) => (
@@ -227,10 +232,10 @@ const Landing = () => {
                     </li>
                   ))}
                 </ul>
-                <Link to="/app" className="block">
+                <Link to={p.href} className="block">
                   <Button
                     className={`w-full h-11 ${
-                      p.highlight
+                      p.highlight || p.isTrial
                         ? 'bg-gradient-gold text-accent-foreground font-semibold shadow-gold hover:opacity-90'
                         : 'bg-secondary text-foreground hover:bg-secondary/80'
                     }`}
@@ -241,6 +246,7 @@ const Landing = () => {
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
