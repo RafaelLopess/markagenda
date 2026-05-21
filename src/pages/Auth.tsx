@@ -28,6 +28,9 @@ const Auth = () => {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       } else {
+        if (!trialAllowed) {
+          throw new Error('Para criar uma conta, escolha o plano de teste grátis na página inicial.');
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -38,7 +41,7 @@ const Auth = () => {
         });
         if (error) throw error;
         toast({
-          title: 'Cadastro realizado!',
+          title: 'Conta criada! 7 dias grátis liberados',
           description: 'Verifique seu e-mail para confirmar a conta.',
         });
       }
