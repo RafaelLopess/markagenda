@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Mail, Lock, User, Sparkles } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,9 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [searchParams] = useSearchParams();
+  const trialAllowed = searchParams.get('signup') === 'trial';
+  const [isLogin, setIsLogin] = useState(!trialAllowed);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
