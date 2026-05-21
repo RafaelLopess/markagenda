@@ -25,8 +25,25 @@ const features = [
 
 const plans = [
   {
+    name: 'Teste grátis',
+    priceLabel: 'R$ 0',
+    period: 'por 7 dias',
+    desc: 'Experimente tudo sem compromisso. Único caminho para criar conta.',
+    features: [
+      'Acesso completo por 7 dias',
+      'Agenda, clientes e serviços',
+      'Dashboard de faturamento',
+      'Sem cartão de crédito',
+    ],
+    highlight: false,
+    cta: 'Começar grátis por 7 dias',
+    href: '/app?signup=trial',
+    isTrial: true,
+  },
+  {
     name: 'Básico',
-    price: 39,
+    priceLabel: 'R$ 39',
+    period: '/mês',
     desc: 'Para quem está começando a organizar a agenda.',
     features: [
       'Agenda online ilimitada',
@@ -35,11 +52,14 @@ const plans = [
       'Suporte por e-mail',
     ],
     highlight: false,
-    cta: 'Começar com Básico',
+    cta: 'Assinar Básico',
+    href: '/app',
+    isTrial: false,
   },
   {
     name: 'Pro',
-    price: 79,
+    priceLabel: 'R$ 79',
+    period: '/mês',
     desc: 'O plano completo. Para quem quer crescer.',
     features: [
       'Tudo do Básico, mais:',
@@ -50,6 +70,8 @@ const plans = [
     ],
     highlight: true,
     cta: 'Assinar plano Pro',
+    href: '/app',
+    isTrial: false,
   },
 ];
 
