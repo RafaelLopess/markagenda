@@ -284,12 +284,12 @@ const Landing = () => {
           <p className="text-muted-foreground mb-8 text-lg">
             Junte-se aos profissionais que pararam de perder cliente por desorganização.
           </p>
-          <Link to="/app">
+          <Link to="/app?signup=trial">
             <Button
               size="lg"
               className="bg-gradient-gold text-accent-foreground font-semibold shadow-gold hover:opacity-90 px-10 h-12"
             >
-              Criar minha conta grátis
+              Começar grátis por 7 dias
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
