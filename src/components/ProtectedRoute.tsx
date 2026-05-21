@@ -1,5 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import Auth from '@/pages/Auth';
+import TrialGuard from '@/components/TrialGuard';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { session, loading } = useAuth();
@@ -16,7 +17,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Auth />;
   }
 
-  return <>{children}</>;
+  return <TrialGuard>{children}</TrialGuard>;
 };
 
 export default ProtectedRoute;
