@@ -144,13 +144,22 @@ const Auth = () => {
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              {isLogin ? 'Não tem conta? Cadastre-se' : 'Já tem conta? Faça login'}
-            </button>
+          <div className="mt-6 text-center text-sm">
+            {isLogin ? (
+              <Link
+                to="/#planos"
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Não tem conta? <span className="font-semibold text-primary">Comece grátis por 7 dias</span>
+              </Link>
+            ) : (
+              <button
+                onClick={() => setIsLogin(true)}
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Já tem conta? Faça login
+              </button>
+            )}
           </div>
         </div>
       </motion.div>
