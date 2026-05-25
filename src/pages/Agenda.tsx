@@ -60,6 +60,8 @@ const Agenda = () => {
 
     const total = Math.max(1, parseInt(parcelasTotal || '1', 10));
     const pagas = Math.min(total, Math.max(0, parseInt(parcelasPagas || '0', 10)));
+    const sTotal = Math.max(1, parseInt(sessoesTotal || '1', 10));
+    const sFeitas = Math.min(sTotal, Math.max(0, parseInt(sessoesRealizadas || '0', 10)));
 
     try {
       await addAppointment.mutateAsync({
@@ -75,6 +77,8 @@ const Agenda = () => {
         sala,
         parcelas_total: total,
         parcelas_pagas: pagas,
+        sessoes_total: sTotal,
+        sessoes_realizadas: sFeitas,
       });
       setOpen(false);
       setClientId('');
@@ -83,6 +87,8 @@ const Agenda = () => {
       setSala('Sala 1');
       setParcelasTotal('1');
       setParcelasPagas('0');
+      setSessoesTotal('1');
+      setSessoesRealizadas('0');
       toast({ title: 'Agendamento criado!' });
     } catch {
       toast({ title: 'Erro ao criar agendamento', variant: 'destructive' });
