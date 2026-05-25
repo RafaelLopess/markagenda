@@ -171,6 +171,13 @@ const Clientes = () => {
               const apts = aptsByClient.get(client.id) ?? [];
               const visits = apts.length;
               const last = apts[0];
+              const activePackages = apts.filter(
+                (a) => (a.sessoes_total ?? 1) > 1 && (a.sessoes_realizadas ?? 0) < (a.sessoes_total ?? 1),
+              );
+              const sessoesRestantes = activePackages.reduce(
+                (sum, a) => sum + ((a.sessoes_total ?? 1) - (a.sessoes_realizadas ?? 0)),
+                0,
+              );
               return (
                 <motion.div
                   key={client.id}
@@ -207,6 +214,31 @@ const Clientes = () => {
                       <p className="text-primary font-semibold mt-0.5">R$ {Number(client.total_spent).toFixed(2)}</p>
                     </div>
                   </div>
+
+                  {activePackages.length > 0 && (
+                    <div className="mt-3 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 space-y-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[11px] font-semibold text-primary flex items-center gap-1">
+                          <Activity className="w-3 h-3" /> Pacotes ativos
+                        </p>
+                        <span className="text-[11px] font-bold text-primary">
+                          {sessoesRestantes} {sessoesRestantes === 1 ? 'sessão' : 'sessões'} restantes
+                        </span>
+                      </div>
+                      {activePackages.slice(0, 3).map((a) => {
+                        const tot = a.sessoes_total ?? 1;
+                        const fei = a.sessoes_realizadas ?? 0;
+                        return (
+                          <p key={a.id} className="text-[11px] text-muted-foreground truncate">
+                            • {a.service_name}: <span className="font-medium text-foreground">{fei}/{tot}</span>
+                          </p>
+                        );
+                      })}
+                      {activePackages.length > 3 && (
+                        <p className="text-[10px] text-muted-foreground">+{activePackages.length - 3} pacote(s)</p>
+                      )}
+                    </div>
+                  )}
 
                   <div className="flex gap-2 mt-3">
                     <Button size="sm" variant="outline" className="flex-1" onClick={() => setHistoryClient(client)}>
