@@ -39,6 +39,8 @@ const Agenda = () => {
   const [sala, setSala] = useState<string>('Sala 1');
   const [parcelasTotal, setParcelasTotal] = useState<string>('1');
   const [parcelasPagas, setParcelasPagas] = useState<string>('0');
+  const [sessoesTotal, setSessoesTotal] = useState<string>('1');
+  const [sessoesRealizadas, setSessoesRealizadas] = useState<string>('0');
 
   const [roomFilter, setRoomFilter] = useState<typeof ROOM_FILTERS[number]>('Todas');
 
