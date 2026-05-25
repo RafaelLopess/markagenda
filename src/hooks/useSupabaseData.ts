@@ -168,3 +168,17 @@ export const useUpdateAppointmentParcelas = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['appointments'] }),
   });
 };
+
+export const useUpdateAppointmentSessoes = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, sessoes_realizadas }: { id: string; sessoes_realizadas: number }) => {
+      const { error } = await supabase
+        .from('appointments')
+        .update({ sessoes_realizadas })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['appointments'] }),
+  });
+};
