@@ -36,6 +36,8 @@ export interface Appointment {
   sala: string | null;
   parcelas_total: number;
   parcelas_pagas: number;
+  sessoes_total: number;
+  sessoes_realizadas: number;
   created_at: string;
 }
 
@@ -132,6 +134,8 @@ export const useAddAppointment = () => {
       sala?: string | null;
       parcelas_total?: number;
       parcelas_pagas?: number;
+      sessoes_total?: number;
+      sessoes_realizadas?: number;
     }) => {
       const { error } = await supabase.from('appointments').insert({ ...apt, user_id: user!.id });
       if (error) throw error;
@@ -158,6 +162,20 @@ export const useUpdateAppointmentParcelas = () => {
       const { error } = await supabase
         .from('appointments')
         .update({ parcelas_pagas })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['appointments'] }),
+  });
+};
+
+export const useUpdateAppointmentSessoes = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, sessoes_realizadas }: { id: string; sessoes_realizadas: number }) => {
+      const { error } = await supabase
+        .from('appointments')
+        .update({ sessoes_realizadas })
         .eq('id', id);
       if (error) throw error;
     },

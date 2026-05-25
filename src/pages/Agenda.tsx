@@ -39,6 +39,8 @@ const Agenda = () => {
   const [sala, setSala] = useState<string>('Sala 1');
   const [parcelasTotal, setParcelasTotal] = useState<string>('1');
   const [parcelasPagas, setParcelasPagas] = useState<string>('0');
+  const [sessoesTotal, setSessoesTotal] = useState<string>('1');
+  const [sessoesRealizadas, setSessoesRealizadas] = useState<string>('0');
 
   const [roomFilter, setRoomFilter] = useState<typeof ROOM_FILTERS[number]>('Todas');
 
@@ -58,6 +60,8 @@ const Agenda = () => {
 
     const total = Math.max(1, parseInt(parcelasTotal || '1', 10));
     const pagas = Math.min(total, Math.max(0, parseInt(parcelasPagas || '0', 10)));
+    const sTotal = Math.max(1, parseInt(sessoesTotal || '1', 10));
+    const sFeitas = Math.min(sTotal, Math.max(0, parseInt(sessoesRealizadas || '0', 10)));
 
     try {
       await addAppointment.mutateAsync({
@@ -73,6 +77,8 @@ const Agenda = () => {
         sala,
         parcelas_total: total,
         parcelas_pagas: pagas,
+        sessoes_total: sTotal,
+        sessoes_realizadas: sFeitas,
       });
       setOpen(false);
       setClientId('');
@@ -81,6 +87,8 @@ const Agenda = () => {
       setSala('Sala 1');
       setParcelasTotal('1');
       setParcelasPagas('0');
+      setSessoesTotal('1');
+      setSessoesRealizadas('0');
       toast({ title: 'Agendamento criado!' });
     } catch {
       toast({ title: 'Erro ao criar agendamento', variant: 'destructive' });
@@ -198,6 +206,37 @@ const Agenda = () => {
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Para pagamento à vista, deixe 1 parcela total e 1 paga.
+                  </p>
+                </div>
+
+                <div className="border-t border-border pt-4 space-y-3">
+                  <Label className="text-sm">Pacote de sessões</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label className="text-xs text-muted-foreground">Sessões compradas</Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={100}
+                        value={sessoesTotal}
+                        onChange={(e) => setSessoesTotal(e.target.value)}
+                        className="bg-secondary border-border"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs text-muted-foreground">Sessões já realizadas</Label>
+                      <Input
+                        type="number"
+                        min={0}
+                        max={parseInt(sessoesTotal || '1', 10)}
+                        value={sessoesRealizadas}
+                        onChange={(e) => setSessoesRealizadas(e.target.value)}
+                        className="bg-secondary border-border"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Ex.: 10 sessões de massagem · marque quantas já foram feitas.
                   </p>
                 </div>
 

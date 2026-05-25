@@ -1,5 +1,7 @@
-import { MapPin, CreditCard } from 'lucide-react';
+import { MapPin, CreditCard, Activity, Plus } from 'lucide-react';
 import type { Appointment } from '@/hooks/useSupabaseData';
+import { useUpdateAppointmentSessoes } from '@/hooks/useSupabaseData';
+import { useToast } from '@/hooks/use-toast';
 
 const statusStyles = {
   confirmed: 'bg-success/10 text-success border border-success/20',
@@ -22,6 +24,28 @@ const AppointmentCard = ({ appointment }: { appointment: Appointment }) => {
   const valorParcela = Number(appointment.price) / total;
   const showParcelas = total > 1;
 
+  const sTotal = Number(appointment.sessoes_total) || 1;
+  const sFeitas = Number(appointment.sessoes_realizadas) || 0;
+  const sRestantes = Math.max(sTotal - sFeitas, 0);
+  const showSessoes = sTotal > 1;
+
+  const updateSessoes = useUpdateAppointmentSessoes();
+  const { toast } = useToast();
+
+  const handleAddSessao = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (sRestantes === 0) return;
+    try {
+      await updateSessoes.mutateAsync({
+        id: appointment.id,
+        sessoes_realizadas: sFeitas + 1,
+      });
+      toast({ title: `Sessão registrada (${sFeitas + 1}/${sTotal})` });
+    } catch {
+      toast({ title: 'Erro ao atualizar sessão', variant: 'destructive' });
+    }
+  };
+
   return (
     <div className="flex flex-col gap-3 p-4 bg-card rounded-xl border border-border hover:border-primary/40 hover:shadow-card transition-all">
       <div className="flex items-center gap-4">
@@ -41,7 +65,7 @@ const AppointmentCard = ({ appointment }: { appointment: Appointment }) => {
         </div>
       </div>
 
-      {(appointment.sala || showParcelas) && (
+      {(appointment.sala || showParcelas || showSessoes) && (
         <div className="flex flex-wrap items-center gap-2 pl-[72px] -mt-1">
           {appointment.sala && (
             <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground">
@@ -63,6 +87,31 @@ const AppointmentCard = ({ appointment }: { appointment: Appointment }) => {
                 ? `Quitado · ${total}x`
                 : `${paid}/${total} pagas · faltam ${remaining}`}
             </span>
+          )}
+          {showSessoes && (
+            <span
+              className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md ${
+                sRestantes === 0
+                  ? 'bg-success/10 text-success'
+                  : 'bg-accent/10 text-accent-foreground border border-accent/30'
+              }`}
+            >
+              <Activity className="w-3 h-3" />
+              {sRestantes === 0
+                ? `Pacote concluído · ${sTotal} sessões`
+                : `${sFeitas}/${sTotal} sessões · faltam ${sRestantes}`}
+            </span>
+          )}
+          {showSessoes && sRestantes > 0 && (
+            <button
+              onClick={handleAddSessao}
+              disabled={updateSessoes.isPending}
+              className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-50"
+              title="Registrar mais uma sessão realizada"
+            >
+              <Plus className="w-3 h-3" />
+              Sessão feita
+            </button>
           )}
         </div>
       )}
