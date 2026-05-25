@@ -209,6 +209,37 @@ const Agenda = () => {
                   </p>
                 </div>
 
+                <div className="border-t border-border pt-4 space-y-3">
+                  <Label className="text-sm">Pacote de sessões</Label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label className="text-xs text-muted-foreground">Sessões compradas</Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={100}
+                        value={sessoesTotal}
+                        onChange={(e) => setSessoesTotal(e.target.value)}
+                        className="bg-secondary border-border"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs text-muted-foreground">Sessões já realizadas</Label>
+                      <Input
+                        type="number"
+                        min={0}
+                        max={parseInt(sessoesTotal || '1', 10)}
+                        value={sessoesRealizadas}
+                        onChange={(e) => setSessoesRealizadas(e.target.value)}
+                        className="bg-secondary border-border"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Ex.: 10 sessões de massagem · marque quantas já foram feitas.
+                  </p>
+                </div>
+
                 <Button
                   type="submit"
                   disabled={addAppointment.isPending}
