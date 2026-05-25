@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Phone, Calendar, Plus, History, RefreshCw, MessageCircle } from 'lucide-react';
+import { Search, Phone, Calendar, Plus, History, RefreshCw, MessageCircle, Activity } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { useClients, useAddClient, useAppointments, useServices, useAddAppointment, type Client } from '@/hooks/useSupabaseData';
 import { Input } from '@/components/ui/input';
