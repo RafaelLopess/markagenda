@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Phone, Calendar, Plus, History, RefreshCw, MessageCircle } from 'lucide-react';
+import { Search, Phone, Calendar, Plus, History, RefreshCw, MessageCircle, Activity } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { useClients, useAddClient, useAppointments, useServices, useAddAppointment, type Client } from '@/hooks/useSupabaseData';
 import { Input } from '@/components/ui/input';
@@ -171,6 +171,13 @@ const Clientes = () => {
               const apts = aptsByClient.get(client.id) ?? [];
               const visits = apts.length;
               const last = apts[0];
+              const activePackages = apts.filter(
+                (a) => (a.sessoes_total ?? 1) > 1 && (a.sessoes_realizadas ?? 0) < (a.sessoes_total ?? 1),
+              );
+              const sessoesRestantes = activePackages.reduce(
+                (sum, a) => sum + ((a.sessoes_total ?? 1) - (a.sessoes_realizadas ?? 0)),
+                0,
+              );
               return (
                 <motion.div
                   key={client.id}
@@ -208,6 +215,31 @@ const Clientes = () => {
                     </div>
                   </div>
 
+                  {activePackages.length > 0 && (
+                    <div className="mt-3 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 space-y-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[11px] font-semibold text-primary flex items-center gap-1">
+                          <Activity className="w-3 h-3" /> Pacotes ativos
+                        </p>
+                        <span className="text-[11px] font-bold text-primary">
+                          {sessoesRestantes} {sessoesRestantes === 1 ? 'sessão' : 'sessões'} restantes
+                        </span>
+                      </div>
+                      {activePackages.slice(0, 3).map((a) => {
+                        const tot = a.sessoes_total ?? 1;
+                        const fei = a.sessoes_realizadas ?? 0;
+                        return (
+                          <p key={a.id} className="text-[11px] text-muted-foreground truncate">
+                            • {a.service_name}: <span className="font-medium text-foreground">{fei}/{tot}</span>
+                          </p>
+                        );
+                      })}
+                      {activePackages.length > 3 && (
+                        <p className="text-[10px] text-muted-foreground">+{activePackages.length - 3} pacote(s)</p>
+                      )}
+                    </div>
+                  )}
+
                   <div className="flex gap-2 mt-3">
                     <Button size="sm" variant="outline" className="flex-1" onClick={() => setHistoryClient(client)}>
                       <History className="w-3.5 h-3.5 mr-1" /> Histórico
@@ -240,20 +272,31 @@ const Clientes = () => {
             {historyClient && (aptsByClient.get(historyClient.id) ?? []).length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">Nenhum atendimento registrado ainda.</p>
             ) : (
-              historyClient && (aptsByClient.get(historyClient.id) ?? []).map(a => (
-                <div key={a.id} className="flex items-center justify-between bg-secondary/50 rounded-lg px-3 py-2.5">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{a.service_name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {format(new Date(a.date), "dd 'de' MMM yyyy", { locale: ptBR })} às {a.time.slice(0,5)}
-                    </p>
+              historyClient && (aptsByClient.get(historyClient.id) ?? []).map(a => {
+                const tot = a.sessoes_total ?? 1;
+                const fei = a.sessoes_realizadas ?? 0;
+                const showSes = tot > 1;
+                return (
+                  <div key={a.id} className="flex items-center justify-between bg-secondary/50 rounded-lg px-3 py-2.5">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{a.service_name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {format(new Date(a.date), "dd 'de' MMM yyyy", { locale: ptBR })} às {a.time.slice(0,5)}
+                      </p>
+                      {showSes && (
+                        <p className="text-[11px] text-primary font-medium mt-0.5 flex items-center gap-1">
+                          <Activity className="w-3 h-3" />
+                          Sessões: {fei}/{tot} {fei >= tot ? '· concluído' : `· faltam ${tot - fei}`}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-right shrink-0 ml-2">
+                      <p className="text-sm font-semibold text-primary">R$ {Number(a.price).toFixed(2)}</p>
+                      <Badge variant="outline" className="text-[10px] mt-0.5">{a.status}</Badge>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-primary">R$ {Number(a.price).toFixed(2)}</p>
-                    <Badge variant="outline" className="text-[10px] mt-0.5">{a.status}</Badge>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
           {historyClient && (
