@@ -272,20 +272,31 @@ const Clientes = () => {
             {historyClient && (aptsByClient.get(historyClient.id) ?? []).length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">Nenhum atendimento registrado ainda.</p>
             ) : (
-              historyClient && (aptsByClient.get(historyClient.id) ?? []).map(a => (
-                <div key={a.id} className="flex items-center justify-between bg-secondary/50 rounded-lg px-3 py-2.5">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{a.service_name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {format(new Date(a.date), "dd 'de' MMM yyyy", { locale: ptBR })} às {a.time.slice(0,5)}
-                    </p>
+              historyClient && (aptsByClient.get(historyClient.id) ?? []).map(a => {
+                const tot = a.sessoes_total ?? 1;
+                const fei = a.sessoes_realizadas ?? 0;
+                const showSes = tot > 1;
+                return (
+                  <div key={a.id} className="flex items-center justify-between bg-secondary/50 rounded-lg px-3 py-2.5">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{a.service_name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {format(new Date(a.date), "dd 'de' MMM yyyy", { locale: ptBR })} às {a.time.slice(0,5)}
+                      </p>
+                      {showSes && (
+                        <p className="text-[11px] text-primary font-medium mt-0.5 flex items-center gap-1">
+                          <Activity className="w-3 h-3" />
+                          Sessões: {fei}/{tot} {fei >= tot ? '· concluído' : `· faltam ${tot - fei}`}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-right shrink-0 ml-2">
+                      <p className="text-sm font-semibold text-primary">R$ {Number(a.price).toFixed(2)}</p>
+                      <Badge variant="outline" className="text-[10px] mt-0.5">{a.status}</Badge>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-primary">R$ {Number(a.price).toFixed(2)}</p>
-                    <Badge variant="outline" className="text-[10px] mt-0.5">{a.status}</Badge>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
           {historyClient && (
