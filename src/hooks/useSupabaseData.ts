@@ -134,6 +134,8 @@ export const useAddAppointment = () => {
       sala?: string | null;
       parcelas_total?: number;
       parcelas_pagas?: number;
+      sessoes_total?: number;
+      sessoes_realizadas?: number;
     }) => {
       const { error } = await supabase.from('appointments').insert({ ...apt, user_id: user!.id });
       if (error) throw error;
