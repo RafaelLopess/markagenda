@@ -36,6 +36,8 @@ export interface Appointment {
   sala: string | null;
   parcelas_total: number;
   parcelas_pagas: number;
+  sessoes_total: number;
+  sessoes_realizadas: number;
   created_at: string;
 }
 
