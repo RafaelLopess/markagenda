@@ -28,6 +28,8 @@ export type Database = {
           sala: string | null
           service_id: string | null
           service_name: string
+          sessoes_realizadas: number
+          sessoes_total: number
           status: string
           time: string
           user_id: string
@@ -45,6 +47,8 @@ export type Database = {
           sala?: string | null
           service_id?: string | null
           service_name: string
+          sessoes_realizadas?: number
+          sessoes_total?: number
           status?: string
           time: string
           user_id: string
@@ -62,6 +66,8 @@ export type Database = {
           sala?: string | null
           service_id?: string | null
           service_name?: string
+          sessoes_realizadas?: number
+          sessoes_total?: number
           status?: string
           time?: string
           user_id?: string
