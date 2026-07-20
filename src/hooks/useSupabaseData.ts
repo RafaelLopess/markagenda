@@ -137,8 +137,17 @@ export const useAddAppointment = () => {
       sessoes_total?: number;
       sessoes_realizadas?: number;
     }) => {
-      const { error } = await supabase.from('appointments').insert({ ...apt, user_id: user!.id });
+      const { data, error } = await supabase
+        .from('appointments')
+        .insert({ ...apt, user_id: user!.id })
+        .select()
+        .single();
       if (error) throw error;
+      // Fire-and-forget confirmation
+      supabase.functions.invoke('whatsapp-send', {
+        body: { appointment_id: data.id, message_type: 'confirmation' },
+      }).catch(() => {});
+      return data;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['appointments'] }),
   });
@@ -150,6 +159,11 @@ export const useUpdateAppointmentStatus = () => {
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
       const { error } = await supabase.from('appointments').update({ status }).eq('id', id);
       if (error) throw error;
+      if (status === 'cancelled') {
+        supabase.functions.invoke('whatsapp-send', {
+          body: { appointment_id: id, message_type: 'cancellation' },
+        }).catch(() => {});
+      }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['appointments'] }),
   });
