@@ -33,7 +33,7 @@ const TrialGuard = ({ children }: { children: React.ReactNode }) => {
   }
 
   const now = new Date();
-  const expired = trialEndsAt && trialEndsAt < now;
+  const expired = !isAdmin && trialEndsAt && trialEndsAt < now;
   const daysLeft = trialEndsAt
     ? Math.max(0, Math.ceil((trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
     : 0;
