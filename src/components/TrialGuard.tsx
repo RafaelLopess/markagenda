@@ -10,18 +10,18 @@ const TrialGuard = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [trialEndsAt, setTrialEndsAt] = useState<Date | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (!user) return;
-    supabase
-      .from('profiles')
-      .select('trial_ends_at')
-      .eq('id', user.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data?.trial_ends_at) setTrialEndsAt(new Date(data.trial_ends_at));
-        setLoading(false);
-      });
+    Promise.all([
+      supabase.from('profiles').select('trial_ends_at').eq('id', user.id).maybeSingle(),
+      (supabase.from as any)('user_roles').select('role').eq('user_id', user.id).eq('role', 'admin').maybeSingle(),
+    ]).then(([profileRes, roleRes]: any) => {
+      if (profileRes.data?.trial_ends_at) setTrialEndsAt(new Date(profileRes.data.trial_ends_at));
+      if (roleRes.data) setIsAdmin(true);
+      setLoading(false);
+    });
   }, [user]);
 
   if (loading) {
@@ -33,7 +33,7 @@ const TrialGuard = ({ children }: { children: React.ReactNode }) => {
   }
 
   const now = new Date();
-  const expired = trialEndsAt && trialEndsAt < now;
+  const expired = !isAdmin && trialEndsAt && trialEndsAt < now;
   const daysLeft = trialEndsAt
     ? Math.max(0, Math.ceil((trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
     : 0;
@@ -69,7 +69,7 @@ const TrialGuard = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      {daysLeft <= 3 && (
+      {!isAdmin && daysLeft <= 3 && (
         <div className="bg-gradient-gold text-accent-foreground px-4 py-2 text-sm font-medium flex items-center justify-center gap-2">
           <Clock className="w-4 h-4" />
           {daysLeft === 0
