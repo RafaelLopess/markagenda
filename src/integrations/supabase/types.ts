@@ -25,6 +25,7 @@ export type Database = {
           parcelas_pagas: number
           parcelas_total: number
           price: number
+          reminders_sent: string[]
           sala: string | null
           service_id: string | null
           service_name: string
@@ -44,6 +45,7 @@ export type Database = {
           parcelas_pagas?: number
           parcelas_total?: number
           price?: number
+          reminders_sent?: string[]
           sala?: string | null
           service_id?: string | null
           service_name: string
@@ -63,6 +65,7 @@ export type Database = {
           parcelas_pagas?: number
           parcelas_total?: number
           price?: number
+          reminders_sent?: string[]
           sala?: string | null
           service_id?: string | null
           service_name?: string
@@ -196,6 +199,113 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      whatsapp_config: {
+        Row: {
+          access_token: string
+          active: boolean
+          created_at: string
+          display_phone: string
+          phone_number_id: string
+          reminder_hours: number[]
+          template_cancellation_name: string
+          template_cancellation_text: string
+          template_confirmation_name: string
+          template_confirmation_text: string
+          template_language: string
+          template_reminder_name: string
+          template_reminder_text: string
+          updated_at: string
+          user_id: string
+          waba_id: string
+        }
+        Insert: {
+          access_token?: string
+          active?: boolean
+          created_at?: string
+          display_phone?: string
+          phone_number_id?: string
+          reminder_hours?: number[]
+          template_cancellation_name?: string
+          template_cancellation_text?: string
+          template_confirmation_name?: string
+          template_confirmation_text?: string
+          template_language?: string
+          template_reminder_name?: string
+          template_reminder_text?: string
+          updated_at?: string
+          user_id: string
+          waba_id?: string
+        }
+        Update: {
+          access_token?: string
+          active?: boolean
+          created_at?: string
+          display_phone?: string
+          phone_number_id?: string
+          reminder_hours?: number[]
+          template_cancellation_name?: string
+          template_cancellation_text?: string
+          template_confirmation_name?: string
+          template_confirmation_text?: string
+          template_language?: string
+          template_reminder_name?: string
+          template_reminder_text?: string
+          updated_at?: string
+          user_id?: string
+          waba_id?: string
+        }
+        Relationships: []
+      }
+      whatsapp_messages: {
+        Row: {
+          appointment_id: string | null
+          created_at: string
+          error: string | null
+          id: string
+          message_type: string
+          rendered_text: string
+          sent_at: string | null
+          status: string
+          to_phone: string
+          user_id: string
+          wa_message_id: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          message_type: string
+          rendered_text?: string
+          sent_at?: string | null
+          status?: string
+          to_phone: string
+          user_id: string
+          wa_message_id?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          message_type?: string
+          rendered_text?: string
+          sent_at?: string | null
+          status?: string
+          to_phone?: string
+          user_id?: string
+          wa_message_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_messages_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
