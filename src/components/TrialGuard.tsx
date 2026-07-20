@@ -10,18 +10,18 @@ const TrialGuard = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [trialEndsAt, setTrialEndsAt] = useState<Date | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (!user) return;
-    supabase
-      .from('profiles')
-      .select('trial_ends_at')
-      .eq('id', user.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data?.trial_ends_at) setTrialEndsAt(new Date(data.trial_ends_at));
-        setLoading(false);
-      });
+    Promise.all([
+      supabase.from('profiles').select('trial_ends_at').eq('id', user.id).maybeSingle(),
+      (supabase.from as any)('user_roles').select('role').eq('user_id', user.id).eq('role', 'admin').maybeSingle(),
+    ]).then(([profileRes, roleRes]: any) => {
+      if (profileRes.data?.trial_ends_at) setTrialEndsAt(new Date(profileRes.data.trial_ends_at));
+      if (roleRes.data) setIsAdmin(true);
+      setLoading(false);
+    });
   }, [user]);
 
   if (loading) {
