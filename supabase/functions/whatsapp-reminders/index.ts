@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
 
   // Shared secret auth
   const secret = req.headers.get('x-cron-secret');
-  if (!secret || secret !== Deno.env.get('WHATSAPP_CRON_SECRET')) {
+  if (!secret || secret !== Deno.env.get('WHATSAPP_CRON_TOKEN')) {
     return new Response(JSON.stringify({ error: 'forbidden' }), {
       status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
