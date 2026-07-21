@@ -1,13 +1,23 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Mail, Lock, User, Sparkles } from 'lucide-react';
+import { Mail, Lock, User, Sparkles, Briefcase } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+
+type BusinessType = 'barbearia' | 'clinica_estetica' | 'manicure' | 'clinica_odontologica';
+
+const BUSINESS_OPTIONS: { value: BusinessType; label: string }[] = [
+  { value: 'barbearia', label: 'Barbearia' },
+  { value: 'clinica_estetica', label: 'Clínica de Estética' },
+  { value: 'manicure', label: 'Manicure/Nail Designer' },
+  { value: 'clinica_odontologica', label: 'Clínica Odontológica' },
+];
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -17,6 +27,7 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [businessType, setBusinessType] = useState<BusinessType | ''>('');
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,11 +42,14 @@ const Auth = () => {
         if (!trialAllowed) {
           throw new Error('Para criar uma conta, escolha o plano de teste grátis na página inicial.');
         }
+        if (!businessType) {
+          throw new Error('Selecione o tipo de negócio.');
+        }
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: { name },
+            data: { name, business_type: businessType },
             emailRedirectTo: window.location.origin,
           },
         });
@@ -86,20 +100,39 @@ const Auth = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
 
             {!isLogin && (
-              <div className="space-y-2">
-                <Label htmlFor="name">Nome</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    id="name"
-                    placeholder="Seu nome"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="pl-10 bg-secondary border-border"
-                    required
-                  />
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nome</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="name"
+                      placeholder="Seu nome"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="pl-10 bg-secondary border-border"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="business_type">Tipo de negócio</Label>
+                  <div className="relative">
+                    <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10 pointer-events-none" />
+                    <Select value={businessType} onValueChange={(v) => setBusinessType(v as BusinessType)}>
+                      <SelectTrigger id="business_type" className="pl-10 bg-secondary border-border">
+                        <SelectValue placeholder="Selecione o tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {BUSINESS_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </>
             )}
 
             <div className="space-y-2">

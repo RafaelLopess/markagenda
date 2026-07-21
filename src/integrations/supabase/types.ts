@@ -125,6 +125,7 @@ export type Database = {
       profiles: {
         Row: {
           business_name: string | null
+          business_type: Database["public"]["Enums"]["business_type"]
           created_at: string
           id: string
           name: string
@@ -134,6 +135,7 @@ export type Database = {
         }
         Insert: {
           business_name?: string | null
+          business_type?: Database["public"]["Enums"]["business_type"]
           created_at?: string
           id: string
           name?: string
@@ -143,6 +145,7 @@ export type Database = {
         }
         Update: {
           business_name?: string | null
+          business_type?: Database["public"]["Enums"]["business_type"]
           created_at?: string
           id?: string
           name?: string
@@ -322,6 +325,11 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      business_type:
+        | "barbearia"
+        | "clinica_estetica"
+        | "manicure"
+        | "clinica_odontologica"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -450,6 +458,12 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      business_type: [
+        "barbearia",
+        "clinica_estetica",
+        "manicure",
+        "clinica_odontologica",
+      ],
     },
   },
 } as const
