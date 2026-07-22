@@ -110,7 +110,7 @@ const AppointmentCard = ({ appointment }: { appointment: Appointment }) => {
         </div>
       </div>
 
-      {(appointment.sala || showParcelas || showSessoes) && (
+      {(appointment.sala || showParcelas || showSessoes || appointment.status === 'confirmed' || appointment.status === 'pending') && (
         <div className="flex flex-wrap items-center gap-2 pl-[72px] -mt-1">
           {appointment.sala && (
             <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md bg-secondary text-secondary-foreground">
@@ -157,6 +157,60 @@ const AppointmentCard = ({ appointment }: { appointment: Appointment }) => {
               <Plus className="w-3 h-3" />
               Sessão feita
             </button>
+          )}
+
+          {(appointment.status === 'confirmed' || appointment.status === 'pending') && (
+            <>
+              {appointment.status === 'confirmed' && (
+                <button
+                  onClick={handleComplete}
+                  disabled={updateStatus.isPending}
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-success text-success-foreground hover:opacity-90 transition-opacity disabled:opacity-50"
+                  title="Marcar agendamento como concluído"
+                >
+                  <Check className="w-3 h-3" />
+                  Concluir
+                </button>
+              )}
+              {appointment.status === 'pending' && (
+                <button
+                  onClick={handleConfirm}
+                  disabled={updateStatus.isPending}
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-success text-success-foreground hover:opacity-90 transition-opacity disabled:opacity-50"
+                  title="Confirmar agendamento"
+                >
+                  <CheckCircle className="w-3 h-3" />
+                  Confirmar
+                </button>
+              )}
+              <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+                <AlertDialogTrigger asChild>
+                  <button
+                    onClick={(e) => e.stopPropagation()}
+                    disabled={updateStatus.isPending}
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-md bg-destructive text-destructive-foreground hover:opacity-90 transition-opacity disabled:opacity-50"
+                    title="Cancelar agendamento"
+                  >
+                    <XCircle className="w-3 h-3" />
+                    Cancelar
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Cancelar agendamento?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Isso vai alterar o status para <strong>Cancelado</strong> e enviar uma mensagem de cancelamento para o cliente via WhatsApp.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={() => setCancelDialogOpen(false)}>Voltar</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleCancel} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Sim, cancelar
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
           )}
         </div>
       )}
