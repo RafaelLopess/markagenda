@@ -16,6 +16,7 @@ export interface Client {
   user_id: string;
   name: string;
   phone: string;
+  notes: string | null;
   last_visit: string | null;
   total_spent: number;
   created_at: string;
@@ -109,8 +110,30 @@ export const useAddClient = () => {
   const qc = useQueryClient();
   const { user } = useAuth();
   return useMutation({
-    mutationFn: async (client: { name: string; phone: string }) => {
+    mutationFn: async (client: { name: string; phone: string; notes?: string | null }) => {
       const { error } = await supabase.from('clients').insert({ ...client, user_id: user!.id });
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['clients'] }),
+  });
+};
+
+export const useUpdateClient = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, name, phone, notes }: { id: string; name: string; phone: string; notes?: string | null }) => {
+      const { error } = await supabase.from('clients').update({ name, phone, notes }).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['clients'] }),
+  });
+};
+
+export const useDeleteClient = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id }: { id: string }) => {
+      const { error } = await supabase.from('clients').delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['clients'] }),

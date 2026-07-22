@@ -1,11 +1,19 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Phone, Calendar, Plus, History, RefreshCw, MessageCircle, Activity } from 'lucide-react';
+import { Search, Phone, Calendar, Plus, History, RefreshCw, MessageCircle, Activity, Pencil, Trash2, FileText } from 'lucide-react';
 import Layout from '@/components/Layout';
-import { useClients, useAddClient, useAppointments, useServices, useAddAppointment, type Client } from '@/hooks/useSupabaseData';
+import { useClients, useAddClient, useUpdateClient, useDeleteClient, useAppointments, useServices, useAddAppointment, type Client } from '@/hooks/useSupabaseData';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
@@ -19,18 +27,42 @@ const timeSlots = [
   '16:00','16:30','17:00','17:30','18:00','18:30','19:00',
 ];
 
+const notesPlaceholderByType: Record<string, string> = {
+  barbearia: 'Ex: prefere máquina 2, corte social',
+  clinica_estetica: 'Ex: alergias, tipo de pele, restrições',
+  manicure: 'Ex: alergia a acetona, unha fraca',
+  clinica_odontologica: 'Ex: condições de saúde, medicações em uso',
+};
+
 const Clientes = () => {
+  const { user } = useAuth();
   const { data: clients = [], isLoading } = useClients();
   const { data: allAppointments = [] } = useAppointments();
   const { data: services = [] } = useServices();
   const addClient = useAddClient();
+  const updateClient = useUpdateClient();
+  const deleteClient = useDeleteClient();
   const addAppointment = useAddAppointment();
   const { toast } = useToast();
+
+  const [businessType, setBusinessType] = useState<string>('barbearia');
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('profiles').select('business_type').eq('id', user.id).maybeSingle()
+      .then(({ data }) => { if (data?.business_type) setBusinessType(data.business_type); });
+  }, [user]);
+  const notesPlaceholder = notesPlaceholderByType[businessType] ?? notesPlaceholderByType.barbearia;
 
   const [search, setSearch] = useState('');
   const [openNew, setOpenNew] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [notes, setNotes] = useState('');
+
+  const [editClient, setEditClient] = useState<Client | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editPhone, setEditPhone] = useState('');
+  const [editNotes, setEditNotes] = useState('');
 
   const [historyClient, setHistoryClient] = useState<Client | null>(null);
   const [rebookClient, setRebookClient] = useState<Client | null>(null);
@@ -56,17 +88,56 @@ const Clientes = () => {
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanName = name.trim();
-    const cleanPhone = phone.trim();
     if (!cleanName) {
       toast({ title: 'Informe o nome do cliente', variant: 'destructive' });
       return;
     }
     try {
-      await addClient.mutateAsync({ name: cleanName, phone: cleanPhone });
-      setName(''); setPhone(''); setOpenNew(false);
+      await addClient.mutateAsync({ name: cleanName, phone: phone.trim(), notes: notes.trim() || null });
+      setName(''); setPhone(''); setNotes(''); setOpenNew(false);
       toast({ title: 'Cliente cadastrado!' });
     } catch {
       toast({ title: 'Erro ao cadastrar cliente', variant: 'destructive' });
+    }
+  };
+
+  const openEdit = (c: Client) => {
+    setEditClient(c);
+    setEditName(c.name);
+    setEditPhone(c.phone ?? '');
+    setEditNotes(c.notes ?? '');
+  };
+
+  const handleEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editClient) return;
+    const cleanName = editName.trim();
+    if (!cleanName) {
+      toast({ title: 'Informe o nome do cliente', variant: 'destructive' });
+      return;
+    }
+    try {
+      await updateClient.mutateAsync({
+        id: editClient.id,
+        name: cleanName,
+        phone: editPhone.trim(),
+        notes: editNotes.trim() || null,
+      });
+      setEditClient(null);
+      toast({ title: 'Cliente atualizado!' });
+    } catch {
+      toast({ title: 'Erro ao atualizar cliente', variant: 'destructive' });
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!editClient) return;
+    try {
+      await deleteClient.mutateAsync({ id: editClient.id });
+      setEditClient(null);
+      toast({ title: 'Cliente excluído' });
+    } catch {
+      toast({ title: 'Erro ao excluir cliente', variant: 'destructive' });
     }
   };
 
@@ -107,12 +178,13 @@ const Clientes = () => {
 
   const whatsappLink = (client: Client) => {
     const digits = client.phone.replace(/\D/g, '');
-    const msg = encodeURIComponent(`Olá ${client.name}, tudo bem? Que tal agendar seu próximo corte?`);
+    const msg = encodeURIComponent(`Olá ${client.name}, tudo bem? Que tal agendar seu próximo horário?`);
     return `https://wa.me/55${digits}?text=${msg}`;
   };
 
   return (
     <Layout>
+      <TooltipProvider delayDuration={200}>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
@@ -138,6 +210,10 @@ const Clientes = () => {
                   <Label>Telefone (WhatsApp)</Label>
                   <Input value={phone} onChange={e => setPhone(e.target.value)} placeholder="(11) 99999-9999" maxLength={20} inputMode="tel" className="bg-secondary border-border" />
                   <p className="text-xs text-muted-foreground">Opcional, mas necessário para enviar lembretes.</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Observações</Label>
+                  <Textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder={notesPlaceholder} maxLength={500} rows={3} className="bg-secondary border-border resize-none" />
                 </div>
                 <Button type="submit" disabled={addClient.isPending} className="w-full bg-gradient-gold text-accent-foreground font-semibold shadow-gold hover:opacity-90">
                   {addClient.isPending ? 'Salvando...' : 'Cadastrar'}
@@ -191,7 +267,17 @@ const Clientes = () => {
                       <span className="text-base font-semibold text-accent-foreground">{client.name[0]?.toUpperCase()}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-foreground truncate">{client.name}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-semibold text-foreground truncate">{client.name}</p>
+                        {client.notes && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs whitespace-pre-wrap">{client.notes}</TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
                       {client.phone && (
                         <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
                           <Phone className="w-3 h-3" /> {client.phone}
@@ -244,6 +330,9 @@ const Clientes = () => {
                     <Button size="sm" variant="outline" className="flex-1" onClick={() => setHistoryClient(client)}>
                       <History className="w-3.5 h-3.5 mr-1" /> Histórico
                     </Button>
+                    <Button size="sm" variant="outline" onClick={() => openEdit(client)} aria-label="Editar cliente">
+                      <Pencil className="w-3.5 h-3.5" />
+                    </Button>
                     <Button size="sm" className="flex-1 bg-gradient-gold text-accent-foreground hover:opacity-90" onClick={() => openRebook(client)}>
                       <RefreshCw className="w-3.5 h-3.5 mr-1" /> Re-agendar
                     </Button>
@@ -261,6 +350,55 @@ const Clientes = () => {
           </div>
         )}
       </motion.div>
+
+      {/* Editar cliente */}
+      <Dialog open={!!editClient} onOpenChange={(o) => !o && setEditClient(null)}>
+        <DialogContent className="bg-card border-border">
+          <DialogHeader>
+            <DialogTitle className="font-display">Editar cliente</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEdit} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Nome *</Label>
+              <Input value={editName} onChange={e => setEditName(e.target.value)} required maxLength={100} className="bg-secondary border-border" />
+            </div>
+            <div className="space-y-2">
+              <Label>Telefone (WhatsApp)</Label>
+              <Input value={editPhone} onChange={e => setEditPhone(e.target.value)} placeholder="(11) 99999-9999" maxLength={20} inputMode="tel" className="bg-secondary border-border" />
+            </div>
+            <div className="space-y-2">
+              <Label>Observações</Label>
+              <Textarea value={editNotes} onChange={e => setEditNotes(e.target.value)} placeholder={notesPlaceholder} maxLength={500} rows={3} className="bg-secondary border-border resize-none" />
+            </div>
+            <div className="flex gap-2">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button type="button" variant="outline" size="icon" className="text-destructive hover:text-destructive" aria-label="Excluir cliente">
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Excluir cliente?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Isso remove apenas o cadastro de <strong>{editClient?.name}</strong>. O histórico de agendamentos não será apagado.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Excluir
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              <Button type="submit" disabled={updateClient.isPending} className="flex-1 bg-gradient-gold text-accent-foreground font-semibold shadow-gold hover:opacity-90">
+                {updateClient.isPending ? 'Salvando...' : 'Salvar alterações'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Histórico */}
       <Dialog open={!!historyClient} onOpenChange={(o) => !o && setHistoryClient(null)}>
@@ -344,6 +482,7 @@ const Clientes = () => {
           </form>
         </DialogContent>
       </Dialog>
+      </TooltipProvider>
     </Layout>
   );
 };
