@@ -42,7 +42,9 @@ const AppointmentCard = ({ appointment }: { appointment: Appointment }) => {
   const showSessoes = sTotal > 1;
 
   const updateSessoes = useUpdateAppointmentSessoes();
+  const updateStatus = useUpdateAppointmentStatus();
   const { toast } = useToast();
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
 
   const handleAddSessao = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -55,6 +57,37 @@ const AppointmentCard = ({ appointment }: { appointment: Appointment }) => {
       toast({ title: `Sessão registrada (${sFeitas + 1}/${sTotal})` });
     } catch {
       toast({ title: 'Erro ao atualizar sessão', variant: 'destructive' });
+    }
+  };
+
+  const handleConfirm = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await updateStatus.mutateAsync({ id: appointment.id, status: 'confirmed' });
+      toast({ title: 'Agendamento confirmado' });
+    } catch {
+      toast({ title: 'Erro ao confirmar agendamento', variant: 'destructive' });
+    }
+  };
+
+  const handleComplete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await updateStatus.mutateAsync({ id: appointment.id, status: 'completed' });
+      toast({ title: 'Agendamento concluído' });
+    } catch {
+      toast({ title: 'Erro ao concluir agendamento', variant: 'destructive' });
+    }
+  };
+
+  const handleCancel = async () => {
+    try {
+      await updateStatus.mutateAsync({ id: appointment.id, status: 'cancelled' });
+      toast({ title: 'Agendamento cancelado' });
+    } catch {
+      toast({ title: 'Erro ao cancelar agendamento', variant: 'destructive' });
+    } finally {
+      setCancelDialogOpen(false);
     }
   };
 
