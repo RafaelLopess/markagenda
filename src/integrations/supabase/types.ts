@@ -98,6 +98,7 @@ export type Database = {
           id: string
           last_visit: string | null
           name: string
+          notes: string | null
           phone: string
           total_spent: number
           user_id: string
@@ -107,6 +108,7 @@ export type Database = {
           id?: string
           last_visit?: string | null
           name: string
+          notes?: string | null
           phone?: string
           total_spent?: number
           user_id: string
@@ -116,6 +118,7 @@ export type Database = {
           id?: string
           last_visit?: string | null
           name?: string
+          notes?: string | null
           phone?: string
           total_spent?: number
           user_id?: string
