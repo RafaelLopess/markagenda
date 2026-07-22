@@ -1,7 +1,19 @@
-import { MapPin, CreditCard, Activity, Plus } from 'lucide-react';
+import { MapPin, CreditCard, Activity, Plus, Check, CheckCircle, XCircle } from 'lucide-react';
 import type { Appointment } from '@/hooks/useSupabaseData';
-import { useUpdateAppointmentSessoes } from '@/hooks/useSupabaseData';
+import { useUpdateAppointmentSessoes, useUpdateAppointmentStatus } from '@/hooks/useSupabaseData';
 import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { useState } from 'react';
 
 const statusStyles = {
   confirmed: 'bg-success/10 text-success border border-success/20',
