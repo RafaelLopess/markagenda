@@ -16,6 +16,7 @@ export interface Client {
   user_id: string;
   name: string;
   phone: string;
+  notes: string | null;
   last_visit: string | null;
   total_spent: number;
   created_at: string;
