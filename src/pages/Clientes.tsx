@@ -326,23 +326,27 @@ const Clientes = () => {
                     </div>
                   )}
 
-                  <div className="flex gap-2 mt-3">
-                    <Button size="sm" variant="outline" className="flex-1" onClick={() => setHistoryClient(client)}>
-                      <History className="w-3.5 h-3.5 mr-1" /> Histórico
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => openEdit(client)} aria-label="Editar cliente">
-                      <Pencil className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button size="sm" className="flex-1 bg-gradient-gold text-accent-foreground hover:opacity-90" onClick={() => openRebook(client)}>
-                      <RefreshCw className="w-3.5 h-3.5 mr-1" /> Re-agendar
-                    </Button>
-                    {client.phone && (
-                      <Button size="sm" variant="outline" asChild>
-                        <a href={whatsappLink(client)} target="_blank" rel="noopener noreferrer" aria-label="Enviar WhatsApp">
-                          <MessageCircle className="w-3.5 h-3.5" />
-                        </a>
+                  <div className="space-y-2 mt-3">
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" className="flex-1" onClick={() => setHistoryClient(client)}>
+                        <History className="w-3.5 h-3.5 mr-1" /> Histórico
                       </Button>
-                    )}
+                      <Button size="sm" className="flex-1 bg-gradient-gold text-accent-foreground hover:opacity-90" onClick={() => openRebook(client)}>
+                        <RefreshCw className="w-3.5 h-3.5 mr-1" /> Re-agendar
+                      </Button>
+                    </div>
+                    <div className="flex gap-2 justify-end">
+                      <Button size="sm" variant="outline" onClick={() => openEdit(client)} aria-label="Editar cliente">
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                      {client.phone && (
+                        <Button size="sm" variant="outline" asChild>
+                          <a href={whatsappLink(client)} target="_blank" rel="noopener noreferrer" aria-label="Enviar WhatsApp">
+                            <MessageCircle className="w-3.5 h-3.5" />
+                          </a>
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               );
